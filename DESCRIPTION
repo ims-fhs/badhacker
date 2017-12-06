@@ -1,0 +1,15 @@
+Package: badhacker
+Type: Package
+Title: Retrive dependencies between functions. Results can be display with graphs 
+Version: 0.1.0
+Date: 2017-11-26
+Author: Christoph Strauss
+Maintainer: The package maintainer <christoph.strauss@fhsg.ch>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Depends: imsbasics
+Suggests: testthat, Rgraphviz, graphNEL, visNetwork
+RoxygenNote: 6.0.1
