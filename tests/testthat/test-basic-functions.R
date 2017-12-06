@@ -2,9 +2,9 @@ context("basic functions")
 test_that("test basic functions", {
 
   # browser()
-  # my_structure <- get_functional_structure(filename, path)
+  my_structure <- get_functional_structure(filename, path)
 
-  # my_graph <- functional_struture2graph(my_structure)
+  my_graph <- functional_struture2graph(my_structure)
 
   # Rgraphviz::plot(my_graph) # ................................................ creates a pdf???
   # expect_equal(length(file_list), 6)
