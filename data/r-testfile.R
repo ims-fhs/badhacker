@@ -5,9 +5,9 @@
 # }
 
 mysum <- function(x,y,a) {
-  if (x > 0) {print("x > 0")}
+  if (x > 0) { vals <- "x > 0" }
   if (y > 0) {
-    print("y > 0")
+    # print("y > 0")
   }
   return(x+y)
 }
@@ -27,6 +27,6 @@ stupid_fun <- function(x, hurz="hurz") {
   return(NULL)
 }
 
-print(mysum(1,2))
-print(a <- mydot(2,3))
-print(b <- myfun(2,3))
+mysum(1,2)
+a <- mydot(2,3)
+b <- myfun(2,3)
