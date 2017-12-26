@@ -3,7 +3,7 @@ test_that("test graphs", {
 
   # browser()
   my_structure <- create_list_of_functional_structure(filename, path)
-  my_graph <- functional_struture2graph(my_structure)
+  my_graph <- create_graphNEL_object(my_structure)
   connected_components <- graph::connComp(my_graph)
 
   testthat::expect_equal(class(connected_components), "list")
@@ -12,18 +12,14 @@ test_that("test graphs", {
   testthat::expect_equal(connected_components[[2]], c("mysum", "mydot", "myfun"))
   testthat::expect_equal(connected_components[[3]], "stupid_fun")
 
-  # # expect_equal(length(file_list), 6)
-  # # expect_equal(length(file_list), length(file_list_source))
-  #
-  # # attrs <- list(node=list(fontsize = 8, shape="ellipse", fixedsize=FALSE,
-  # #                         label="foo"), #, fillcolor="lightgreen"),
-  # #           edge=list(minlen = 2), #, color="cyan"),
-  # #           graph=list(rankdir="LR"))
-  # # # Users that want to create a clickable graph renderings with drill-down
-  # # # capability should see the imageMap function in the biocGraph package.
-  # # Rgraphviz::plot(my_graph, attrs=attrs)
-  # # Rgraphviz::plot(my_graph, "neato", attrs=attrs)
-  # # Rgraphviz::plot(my_graph, "twopi", attrs=attrs)
+  df <- visualize_functional_structure(my_structure)
+  testthat::expect_equal(df$x$nodes$label,
+                         c("# cool_fun", "mysum", "mydot", "myfun", "stupid_fun"))
+  testthat::expect_equal(names(df),
+                         c("x", "width", "height", "sizingPolicy", "dependencies",
+                           "elementId", "preRenderHook", "jsHooks"))
+  testthat::expect_equal(df$x$edges$from, c(4, 4))
+  testthat::expect_equal(df$x$edges$to, c(2, 3))
 })
 
 

@@ -1,3 +1,11 @@
+#' Create array of indicies
+#'
+#' The value at each position increases (decreases) by one if a brace is opened (closed)
+#' in the corresponding line of the code.
+#'
+#' @param lines_of_code An array, containing the full lines of code as character
+#'
+#' @return An array
 calculate_number_of_open_braces <- function(lines_of_code) {
   open <- grepl("\\{+", lines_of_code)
   close <- grepl("\\}+", lines_of_code)
@@ -6,10 +14,21 @@ calculate_number_of_open_braces <- function(lines_of_code) {
   # Lines with open and closed braces in the same line are ignored.
   open[cond_close] <- F
   close[cond_close] <- F
+
   open_braces <- cumsum(open) - cumsum(close)
+  assertthat::assert_that(open_braces[1] == 0)
+  assertthat::assert_that(open_braces[length(open_braces)] == 0)
   return(open_braces)
 }
 
+#' Get the variables and the corresponding default values
+#'
+#' Return the values for the i-th function with respect to the "array of function names".
+#'
+#' @param list_of_function_arguments An array of characters, the functions' names
+#' @param i An integer, the index
+#'
+#' @return A list containing the variables names and the default values.
 get_variables_defaults <- function(list_of_function_arguments, i) {
   if (length(list_of_function_arguments[[i]]) == 0) {
     vars_name <- ""
@@ -19,9 +38,23 @@ get_variables_defaults <- function(list_of_function_arguments, i) {
     vars_name <- unlist(lapply(c(1:length(vars)), function(x) vars[[x]][1]))
     vars_default <- unlist(lapply(c(1:length(vars)), function(x) vars[[x]][2]))
   }
-  return(list(names=vars_name, defaults=vars_default))
+  return(list(names = vars_name, defaults = vars_default))
 }
 
+#' Create a list of the functional structure
+#'
+#' The list contains all important information (the start index, the stop index,
+#' the names of dependent functions, the arguments, the corresponding defaults,
+#' the file name and the path to the file).
+#'
+#' @param filename A character, the file name
+#' @param path A character, the path to the file
+#'
+#' @return A list
+#' @export
+#'
+#' @examples
+#' my_structure <- create_list_of_functional_structure(filename, path)
 create_list_of_functional_structure <- function(filename, path) {
   lines <- readLines(paste0(path, filename), encoding = "UTF-8")
 
