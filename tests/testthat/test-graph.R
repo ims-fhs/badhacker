@@ -2,7 +2,7 @@ context("graphs")
 test_that("test graphs", {
 
   # browser()
-  my_structure <- get_functional_structure(filename, path)
+  my_structure <- create_list_of_functional_structure(filename, path)
   my_graph <- functional_struture2graph(my_structure)
   connected_components <- graph::connComp(my_graph)
 
