@@ -127,8 +127,10 @@ create_graphNEL_object <- function(my_structure) {
 visualize_functional_structure <- function(my_structure) {
   nodes <- get_nodes_from_structure(my_structure)
   functional_relations <- get_edges_from_structure(my_structure)
-  edges <- data.frame(from = functional_relations$from_id, to = functional_relations$to_id,
-                      arrows = rep("to", nrow(functional_relations)))
+  edges <- data.frame(from = functional_relations$from_id,
+                      to = functional_relations$to_id,
+                      arrows = rep("to", nrow(functional_relations)),
+                      stringsAsFactors = FALSE)
 
   my_graph <- visNetwork(nodes, edges, height = "100%", width = "100%") %>%
     visOptions(highlightNearest = TRUE) %>%

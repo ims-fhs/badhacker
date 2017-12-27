@@ -16,7 +16,6 @@ calculate_number_of_open_braces <- function(lines_of_code) {
   close[cond_close] <- F
 
   open_braces <- cumsum(open) - cumsum(close)
-  assertthat::assert_that(open_braces[1] == 0)
   assertthat::assert_that(open_braces[length(open_braces)] == 0)
   return(open_braces)
 }
@@ -63,12 +62,21 @@ create_list_of_functional_structure <- function(filename, path) {
   function_names <- unlist(lapply(c(1:length(codelines_with_function_names)),
                                   function(x) codelines_with_function_names[[x]][1]))
 
-  open_braces <- calculate_number_of_open_braces(lines)
   n_level <- 0 # definition of function inside function is not considered at the moment
-  ind_start_function <- which(open_braces == n_level &
-                                imsbasics::shift_array(open_braces, -1, 0) == n_level+1) + 1
-  ind_stop_function <- which(open_braces == n_level+1 &
-                               imsbasics::shift_array(open_braces, -1, 0) == n_level) + 1
+  calculate_index_of_start_and_stop_lines <- function(lines, n_level) {
+    open_braces <- calculate_number_of_open_braces(lines)
+    ind_start_function <- which(open_braces == n_level &
+                                  imsbasics::shift_array(open_braces, -1, 0) == n_level+1) + 1
+    if (open_braces[1] >= 1) {
+      ind_start_function <- c(1, ind_start_function)
+    }
+    ind_stop_function <- which(open_braces == n_level+1 &
+                                 imsbasics::shift_array(open_braces, -1, 0) == n_level) + 1
+    return(list(ind_start_function = ind_start_function,
+                ind_stop_function = ind_stop_function))
+  }
+  r <- calculate_index_of_start_and_stop_lines(lines, n_level)
+  ind_start_function <- r$ind_start_function; ind_stop_function <- r$ind_stop_function; rm(r)
 
   function_arguments <- unlist(lapply(c(1:length(codelines_with_function_names)), function(x)
     gsub(" +|(\\()|(\\))|(\\{)", "", codelines_with_function_names[[x]][2])))
