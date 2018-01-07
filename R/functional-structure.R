@@ -84,8 +84,6 @@ create_list_of_functional_structure <- function(filename, path) {
 
   functional_structure <- list()
   for (i in 1:length(function_names)) {
-    # dependent_functions <- unlist(lapply(function_names[-i], function(x)
-    #   any(grepl(x, lines[c(ind_start_function[i]:ind_stop_function[i])]))))
     # address recursion:
     dependent_functions <- unlist(lapply(function_names, function(x)
       any(grepl(x, lines[c((ind_start_function[i]+1):(ind_stop_function[i]-1))]))))
@@ -93,13 +91,6 @@ create_list_of_functional_structure <- function(filename, path) {
     r <- get_variables_defaults(list_of_function_arguments, i)
     args_names <- r$names; args_defaults <- r$defaults; rm(r)
 
-    # df <- list(start = ind_start_function[i],
-    #            stop = ind_stop_function[i],
-    #            calls = function_names[-i][dependent_functions],
-    #            args = args_names,
-    #            defaults = args_defaults,
-    #            in_file = filename,
-    #            path2file = path)
     df <- list(start = ind_start_function[i],
                stop = ind_stop_function[i],
                calls = function_names[dependent_functions],
