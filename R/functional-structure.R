@@ -40,14 +40,34 @@ get_variables_defaults <- function(list_of_function_arguments, i) {
   return(list(names = vars_name, defaults = vars_default))
 }
 
+#' Calculate the index of lines where functions start and stop.
+#'
+#' @param lines An array of characters, representing the lines of code
+#' @param n_level An integer, 0 if a definition of a function inside a function
+#' is forbidden.
+#'
+#' @return A list, the start and stop indicies
+calculate_index_of_start_and_stop_lines <- function(lines, n_level = 0L) {
+  open_braces <- calculate_number_of_open_braces(lines)
+  ind_start_function <- which(open_braces == n_level &
+                                imsbasics::shift_array(open_braces, -1, 0) == n_level+1) + 1
+  if (open_braces[1] >= 1) {
+    ind_start_function <- c(1, ind_start_function)
+  }
+  ind_stop_function <- which(open_braces == n_level+1 &
+                               imsbasics::shift_array(open_braces, -1, 0) == n_level) + 1
+  return(list(ind_start_function = ind_start_function,
+              ind_stop_function = ind_stop_function))
+}
+
 #' Create a list of the functional structure
 #'
 #' The list contains all important information (the start index, the stop index,
 #' the names of dependent functions, the arguments, the corresponding defaults,
 #' the file name and the path to the file).
 #'
-#' @param filename A character, the file name
-#' @param path A character, the path to the file
+#' @param filename A character, the file name(s)
+#' @param path A character, the path to the file(s)
 #'
 #' @return A list
 #' @export
@@ -55,32 +75,41 @@ get_variables_defaults <- function(list_of_function_arguments, i) {
 #' @examples
 #' my_structure <- create_list_of_functional_structure(filename, path)
 create_list_of_functional_structure <- function(filename, path) {
-  lines <- readLines(paste0(path, filename), encoding = "UTF-8")
+  if (length(filename) == 1 & length(path) == 1) {
+    lines <- readLines(paste0(path, filename), encoding = "UTF-8")
+    filename_origin_file <- rep(filename, length(lines))
+    path_origin_file <- rep(path, length(lines))
+  } else {
+    assertthat::assert_that(length(filename) == length(path))
+    for (i in 1:length(filename)) {
+      if (i == 1) {
+        lines <- readLines(paste0(path[i], filename[i]), encoding = "UTF-8")
+        filename_origin_file <- rep(filename[i], length(lines))
+        path_origin_file <- rep(path[i], length(lines))
+      } else {
+        loop_lines <- readLines(paste0(path[i], filename[i]), encoding = "UTF-8")
+        lines <- c(lines, loop_lines)
+        filename_origin_file <- c(filename_origin_file, rep(filename[i], length(loop_lines)))
+        path_origin_file <- c(path_origin_file, rep(path[i], length(loop_lines)))
+      }
 
-  codelines_with_function_names <- strsplit(lines[grepl(" <- function", lines)],
+    }
+  }
+
+  cond_line_contains_function_def <- grepl(" <- function", lines)
+  codelines_with_function_names <- strsplit(lines[cond_line_contains_function_def],
                                             " <- function", fixed = T)
   function_names <- unlist(lapply(c(1:length(codelines_with_function_names)),
                                   function(x) codelines_with_function_names[[x]][1]))
-
-  n_level <- 0 # definition of function inside function is not considered at the moment
-  calculate_index_of_start_and_stop_lines <- function(lines, n_level) {
-    open_braces <- calculate_number_of_open_braces(lines)
-    ind_start_function <- which(open_braces == n_level &
-                                  imsbasics::shift_array(open_braces, -1, 0) == n_level+1) + 1
-    if (open_braces[1] >= 1) {
-      ind_start_function <- c(1, ind_start_function)
-    }
-    ind_stop_function <- which(open_braces == n_level+1 &
-                                 imsbasics::shift_array(open_braces, -1, 0) == n_level) + 1
-    return(list(ind_start_function = ind_start_function,
-                ind_stop_function = ind_stop_function))
-  }
-  r <- calculate_index_of_start_and_stop_lines(lines, n_level)
-  ind_start_function <- r$ind_start_function; ind_stop_function <- r$ind_stop_function; rm(r)
-
   function_arguments <- unlist(lapply(c(1:length(codelines_with_function_names)), function(x)
     gsub(" +|(\\()|(\\))|(\\{)", "", codelines_with_function_names[[x]][2])))
   list_of_function_arguments <- strsplit(function_arguments, ",")
+  in_file <- filename_origin_file[cond_line_contains_function_def]
+  path2file <- path_origin_file[cond_line_contains_function_def]
+
+  n_level <- 0 # definition of function inside function is not considered at the moment
+  r <- calculate_index_of_start_and_stop_lines(lines, n_level)
+  ind_start_function <- r$ind_start_function; ind_stop_function <- r$ind_stop_function; rm(r)
 
   functional_structure <- list()
   for (i in 1:length(function_names)) {
@@ -91,13 +120,13 @@ create_list_of_functional_structure <- function(filename, path) {
     r <- get_variables_defaults(list_of_function_arguments, i)
     args_names <- r$names; args_defaults <- r$defaults; rm(r)
 
-    df <- list(start = ind_start_function[i],
+    df <- list(start = ind_start_function[i], # function_names = function_names[i],
                stop = ind_stop_function[i],
                calls = function_names[dependent_functions],
                args = args_names,
                defaults = args_defaults,
-               in_file = filename,
-               path2file = path)
+               in_file = in_file[i],
+               path2file = path2file[i])
     functional_structure[[function_names[i]]] <- df
   }
   return(functional_structure)

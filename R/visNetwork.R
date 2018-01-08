@@ -27,11 +27,22 @@ get_parents_of <- function(node, my_structure) {
 #' @return A data.frame, the nodes.
 get_nodes_from_structure <- function(my_structure) {
   nodes <- data.frame(id = c(1:length(my_structure)),
+                      # should be my_structure[i]$function_name check where names is used!!!
                       label = names(my_structure),
                       value = rep(0.3, length(my_structure)),
                       # tooltip (html or character), when the mouse is above
-                      title = paste0("<p><b>", names(my_structure),"</b><br>Node !</p>"),
+                      title = character(length(my_structure)),
                       stringsAsFactors = F)
+  # add loop to create titles
+  for (i in 1:nrow(nodes)) {
+    args <- my_structure[[i]]$args
+    args <- ifelse(args[1] == "", "-", paste(args , collapse = ", "))
+    defaults <- my_structure[[i]]$defaults
+    defaults <- ifelse(defaults[1] == "", "-", paste(defaults, collapse = ", "))
+    nodes$title[i] <- paste0("<b>", names(my_structure)[i],"</b><br>",
+                             "<b>args    :</b> ", args, "<br>",
+                             "<b>defaults:</b> ", defaults, "<br>")
+  }
   return(nodes)
 }
 

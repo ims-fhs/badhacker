@@ -7,9 +7,9 @@
 create_list_of_functional_structure(filename, path)
 }
 \arguments{
-\item{filename}{A character, the file name}
+\item{filename}{A character, the file name(s)}
 
-\item{path}{A character, the path to the file}
+\item{path}{A character, the path to the file(s)}
 }
 \value{
 A list

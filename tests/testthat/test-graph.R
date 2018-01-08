@@ -45,6 +45,7 @@ test_that("test with cycles", {
 context("Handling of recursion")
 test_that("test with recursion", {
 
+  # browser()
   my_structure <- create_list_of_functional_structure(filename3, path)
   my_graph <- create_graphNEL_object(my_structure)
   # Rgraphviz::plot(my_graph)
@@ -65,21 +66,24 @@ test_that("test with recursion", {
 context("Handling several files")
 test_that("test with several files", {
 
-  # browser()
-  my_structure <- create_list_of_functional_structure(filename2, path)
-  my_structure <- create_list_of_functional_structure(filename3, path)
+  my_filename <- c(filename2, filename3)
+  my_path <- c(path, path)
+  my_structure <- create_list_of_functional_structure(my_filename, my_path)
   my_graph <- create_graphNEL_object(my_structure)
-  # Rgraphviz::plot(my_graph)
-  # connected_components <- graph::connComp(my_graph)
-  #
-  # testthat::expect_equal(class(connected_components), "list")
-  # testthat::expect_equal(length(connected_components), 1)
-  # testthat::expect_equal(connected_components[[1]],
-  #                        c("helper_fun", "helper_fun2", "my_faculty"))
-  #
-  # df <- visualize_functional_structure(my_structure)
-  # testthat::expect_equal(df$x$nodes$label,
-  #                        c("helper_fun", "helper_fun2", "my_faculty"))
-  # testthat::expect_equal(df$x$edges$from, rep(3,3))
-  # testthat::expect_equal(df$x$edges$to, c(1:3))
+  Rgraphviz::plot(my_graph)
+  connected_components <- graph::connComp(my_graph)
+
+  testthat::expect_equal(class(connected_components), "list")
+  testthat::expect_equal(length(connected_components), 2)
+  testthat::expect_equal(connected_components[[1]],
+                         c("fun_circle1", "fun_circle2", "fun_circle3", "fun_circle4"))
+  testthat::expect_equal(connected_components[[2]],
+                         c("helper_fun", "helper_fun2", "my_faculty"))
+
+  df <- visualize_functional_structure(my_structure)
+  testthat::expect_equal(df$x$nodes$label,
+                         c("fun_circle1", "fun_circle2", "fun_circle3", "fun_circle4",
+                           "helper_fun", "helper_fun2", "my_faculty"))
+  testthat::expect_equal(df$x$edges$from, c(1:4, 7, 7, 7))
+  testthat::expect_equal(df$x$edges$to, c(2, 3, 4, 1, 5, 6, 7))
 })
