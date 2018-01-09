@@ -70,7 +70,7 @@ test_that("test with several files", {
   my_path <- c(path, path)
   my_structure <- create_list_of_functional_structure(my_filename, my_path)
   my_graph <- create_graphNEL_object(my_structure)
-  Rgraphviz::plot(my_graph)
+  # Rgraphviz::plot(my_graph)
   connected_components <- graph::connComp(my_graph)
 
   testthat::expect_equal(class(connected_components), "list")
