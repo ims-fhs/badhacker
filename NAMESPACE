@@ -2,5 +2,6 @@
 
 export(create_graphNEL_object)
 export(create_list_of_functional_structure)
+export(validate_code)
 export(visualize_functional_structure)
 import(visNetwork)
