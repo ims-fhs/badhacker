@@ -1,3 +1,30 @@
+#' Calculate which functions occur in a segment of code
+#'
+#' Function is tricky as neither match nor grep alone do the job:
+#'
+#' @param function_names An array of characters, the functions' names.
+#' @param lines_of_code
+#'
+#' @return dependent_functions
+calculate_dependent_functions <- function(function_names, lines_of_code) {
+  dependent_functions <- unlist(lapply(function_names, function(x) {
+    # any(grepl(x, lines_of_code))
+    search_res <- regexpr(x, lines_of_code)
+    cond_res <- rep(TRUE, length(lines_of_code))
+    cond_res <- (search_res != -1) & cond_res
+    ind_end <- as.integer(search_res + attributes(search_res)$match.length)
+    cond_no_bracket <- substr(lines_of_code[cond_res], ind_end[cond_res], ind_end[cond_res]) == "("
+    ind_start <- as.integer(search_res)
+    cond_no_character_before <- !grepl("[a-zA-Z0-9_]",
+                                       substr(lines_of_code[cond_res],
+                                              ind_start[cond_res]-1,
+                                              ind_start[cond_res]-1))
+    cond_res[which(cond_res)] <- cond_no_bracket & cond_no_character_before
+    any(cond_res)
+  }))
+  return(dependent_functions)
+}
+
 #' Create array of indicies
 #'
 #' The value at each position increases (decreases) by one if a brace is opened (closed)
@@ -113,10 +140,9 @@ create_list_of_functional_structure <- function(filename, path) {
 
   functional_structure <- list()
   for (i in 1:length(function_names)) {
-    # address recursion:
-    dependent_functions <- unlist(lapply(function_names, function(x)
-      any(grepl(x, lines[c((ind_start_function[i]+1):(ind_stop_function[i]-1))]))))
-
+    dependent_functions <- calculate_dependent_functions(
+      function_names,
+      lines[c((ind_start_function[i]+1):(ind_stop_function[i]-1))])
     r <- get_variables_defaults(list_of_function_arguments, i)
     args_names <- r$names; args_defaults <- r$defaults; rm(r)
 

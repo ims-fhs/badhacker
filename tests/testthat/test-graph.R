@@ -87,3 +87,4 @@ test_that("test with several files", {
   testthat::expect_equal(df$x$edges$from, c(1:4, 7, 7, 7))
   testthat::expect_equal(df$x$edges$to, c(2, 3, 4, 1, 5, 6, 7))
 })
+

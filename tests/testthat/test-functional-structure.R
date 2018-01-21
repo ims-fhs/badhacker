@@ -45,3 +45,25 @@ test_that("test create_list_of_functional_structure", {
   testthat::expect_equal(my_structure[[3]]$args, c("x", "y", "b", "c"))
   testthat::expect_equal(my_structure[[3]]$defaults, c(NA, NA, "0", "4"))
 })
+
+context("Handling similar names")
+test_that("test functions with similar names and a function referenced in a comment", {
+
+  my_structure <- create_list_of_functional_structure(filename4, path)
+  my_graph <- create_graphNEL_object(my_structure)
+  # Rgraphviz::plot(my_graph)
+  connected_components <- graph::connComp(my_graph)
+
+  testthat::expect_equal(class(connected_components), "list")
+  testthat::expect_equal(length(connected_components), 2)
+  testthat::expect_equal(connected_components[[1]], "mysum")
+  testthat::expect_equal(connected_components[[2]],
+                         c("similar_mysum", "similarmysum", "myfun", "mysum2"))
+  testthat::expect_equal(my_structure$myfun$calls,
+                         c("similar_mysum", "similarmysum", "mysum2")) # not mysum!
+  testthat::expect_equal(length(my_structure$mysum2$calls), 0)
+  testthat::expect_equal(length(my_structure$mysum$calls), 0)
+  testthat::expect_equal(length(my_structure$similar_mysum$calls), 0)
+  testthat::expect_equal(length(my_structure$similarmysum$calls), 0)
+})
+
