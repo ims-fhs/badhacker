@@ -106,6 +106,7 @@ create_list_of_functional_structure <- function(filename, path) {
     lines <- readLines(paste0(path, filename), encoding = "UTF-8")
     filename_origin_file <- rep(filename, length(lines))
     path_origin_file <- rep(path, length(lines))
+    original_filename_line <- c(1:length(lines))
   } else {
     assertthat::assert_that(length(filename) == length(path))
     for (i in 1:length(filename)) {
@@ -113,15 +114,17 @@ create_list_of_functional_structure <- function(filename, path) {
         lines <- readLines(paste0(path[i], filename[i]), encoding = "UTF-8")
         filename_origin_file <- rep(filename[i], length(lines))
         path_origin_file <- rep(path[i], length(lines))
+        original_filename_line <- c(1:length(lines))
       } else {
         loop_lines <- readLines(paste0(path[i], filename[i]), encoding = "UTF-8")
         lines <- c(lines, loop_lines)
         filename_origin_file <- c(filename_origin_file, rep(filename[i], length(loop_lines)))
         path_origin_file <- c(path_origin_file, rep(path[i], length(loop_lines)))
+        original_filename_line <- c(original_filename_line, 1:length(loop_lines))
       }
-
     }
   }
+  merged_filename_line <- c(1:length(lines))
 
   cond_line_contains_function_def <- grepl(" <- function", lines)
   codelines_with_function_names <- strsplit(lines[cond_line_contains_function_def],
@@ -148,6 +151,10 @@ create_list_of_functional_structure <- function(filename, path) {
 
     df <- list(start = ind_start_function[i], # function_names = function_names[i],
                stop = ind_stop_function[i],
+               original_start = original_filename_line[
+                 which(merged_filename_line == ind_start_function[i])],
+               original_stop = original_filename_line[
+                 which(merged_filename_line == ind_stop_function[i])],
                calls = function_names[dependent_functions],
                args = args_names,
                defaults = args_defaults,

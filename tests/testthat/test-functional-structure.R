@@ -33,8 +33,8 @@ test_that("test create_list_of_functional_structure", {
   testthat::expect_equal(length(my_structure), 5)
   testthat::expect_equal(class(my_structure[[1]]),  "list")
   testthat::expect_equal(names(my_structure[[1]]),
-                             c("start", "stop", "calls", "args",
-                               "defaults", "in_file", "path2file"))
+                             c("start", "stop", "original_start", "original_stop",
+                               "calls", "args",  "defaults", "in_file", "path2file"))
   testthat::expect_equal(names(my_structure),
                              c("# cool_fun", "mysum", "mydot", "myfun", "stupid_fun"))
 
@@ -44,6 +44,34 @@ test_that("test create_list_of_functional_structure", {
 
   testthat::expect_equal(my_structure[[3]]$args, c("x", "y", "b", "c"))
   testthat::expect_equal(my_structure[[3]]$defaults, c(NA, NA, "0", "4"))
+
+  testthat::expect_equal(
+    sapply(c(1:length(my_structure)), function(i) my_structure[[i]]$start),
+    sapply(c(1:length(my_structure)), function(i) my_structure[[i]]$original_start))
+  testthat::expect_equal(
+    sapply(c(1:length(my_structure)), function(i) my_structure[[i]]$stop),
+    sapply(c(1:length(my_structure)), function(i) my_structure[[i]]$original_stop))
+})
+
+context("functional_structure with several files")
+test_that("test functional_structure with several files", {
+
+  my_filename <- c(filename2, filename3)
+  my_path <- c(path, path)
+  my_structure <- create_list_of_functional_structure(my_filename, my_path)
+
+  testthat::expect_equal(
+    sapply(c(1:length(my_structure)), function(i) my_structure[[i]]$start),
+    c(1, 6, 11, 16, 20, 25, 29))
+  testthat::expect_equal(
+    sapply(c(1:length(my_structure)), function(i) my_structure[[i]]$original_start),
+    c(1, 6, 11, 16, 1, 6, 10))
+  testthat::expect_equal(
+    sapply(c(1:length(my_structure)), function(i) my_structure[[i]]$stop),
+    c(4, 9, 14, 19, 23, 27, 37))
+  testthat::expect_equal(
+    sapply(c(1:length(my_structure)), function(i) my_structure[[i]]$original_stop),
+    c(4, 9, 14, 19, 4, 8, 18))
 })
 
 context("Handling similar names")
