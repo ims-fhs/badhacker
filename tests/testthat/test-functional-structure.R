@@ -67,3 +67,32 @@ test_that("test functions with similar names and a function referenced in a comm
   testthat::expect_equal(length(my_structure$similarmysum$calls), 0)
 })
 
+context("test cycle detection")
+test_that("test cycle detection", {
+  skip("Work in progress")
+  my_structure <- create_list_of_functional_structure(filename2, path)
+  my_graph <- create_graphNEL_object(my_structure)
+  # Rgraphviz::plot(my_graph)
+  # connected_components <- graph::connComp(my_graph)
+  nodes <- get_nodes_from_structure(my_structure)
+  functional_relations <- get_edges_from_structure(my_structure)
+  edges <- data.frame(from = functional_relations$from_id,
+                      to = functional_relations$to_id,
+                      arrows = rep("to", nrow(functional_relations)),
+                      stringsAsFactors = FALSE)
+  browser()
+  df <- visualize_functional_structure(my_structure)
+})
+
+context("Handling similar names in one line")
+test_that("test functions with similar names in one line - known bug", {
+
+  my_structure <- create_list_of_functional_structure(filename5, path)
+  my_graph <- create_graphNEL_object(my_structure)
+  # Rgraphviz::plot(my_graph)
+  connected_components <- graph::connComp(my_graph)
+
+  testthat::expect_equal(length(connected_components), 1) # known bug!
+  testthat::expect_equal(my_structure$myfun2$calls, "my_fun1") # !!!
+})
+

@@ -2,8 +2,8 @@ Package: badhacker
 Type: Package
 Title: Retrive dependencies between functions. Results can be display
         with graphs
-Version: 0.1.12
-Date: 2018-01-21
+Version: 0.1.13
+Date: 2018-02-26
 Author: Christoph Strauss
 Maintainer: The package maintainer <christoph.strauss@fhsg.ch>
 Description: More about what it does (maybe more than one line) Use
