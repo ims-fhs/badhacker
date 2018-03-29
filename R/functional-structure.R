@@ -9,18 +9,23 @@
 calculate_dependent_functions <- function(function_names, lines_of_code) {
   dependent_functions <- unlist(lapply(function_names, function(x) {
     # any(grepl(x, lines_of_code))
-    search_res <- regexpr(x, lines_of_code)
-    cond_res <- rep(TRUE, length(lines_of_code))
-    cond_res <- (search_res != -1) & cond_res
-    ind_end <- as.integer(search_res + attributes(search_res)$match.length)
-    cond_no_bracket <- substr(lines_of_code[cond_res], ind_end[cond_res], ind_end[cond_res]) == "("
-    ind_start <- as.integer(search_res)
+    matches <- gregexpr(x, lines_of_code)
+    matches_df <- data.frame(line = numeric(), start = numeric(), end = numeric())
+    for (i in 1:length(matches)) {
+      for (j in 1:length(matches[[i]])) {
+        my_match <- data.frame(line = i,
+                               start = matches[[i]][j],
+                               end = matches[[i]][j] + attributes(matches[[i]])$match.length[j])
+        matches_df <- rbind(matches_df, my_match)
+      }
+    }
+    matches_df <- matches_df[matches_df$start != -1,]
+    cond_no_bracket <- substr(lines_of_code[matches_df$line], matches_df$end, matches_df$end) == "("
     cond_no_character_before <- !grepl("[a-zA-Z0-9_]",
-                                       substr(lines_of_code[cond_res],
-                                              ind_start[cond_res]-1,
-                                              ind_start[cond_res]-1))
-    cond_res[which(cond_res)] <- cond_no_bracket & cond_no_character_before
-    any(cond_res)
+                                       substr(lines_of_code[matches_df$line],
+                                              matches_df$start-1,
+                                              matches_df$start-1))
+    any(cond_no_bracket & cond_no_character_before)
   }))
   return(dependent_functions)
 }
