@@ -121,6 +121,6 @@ test_that("test functions with similar names in one line - known bug", {
   connected_components <- graph::connComp(my_graph)
 
   testthat::expect_equal(length(connected_components), 1) # known bug!
-  testthat::expect_equal(my_structure$myfun2$calls, "my_fun1") # !!!
+  testthat::expect_equal(my_structure$my_fun2$calls, "my_fun1") # !!!
 })
 
