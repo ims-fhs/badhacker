@@ -1,11 +1,37 @@
 #' Retrieve the parents of a node
 #'
-#' Each node represents a function defined in the code.
+#' Each node represents a function defined in the code. Alternatively, use
+#' Needs install.packages("BiocManager") and
+#' BiocManager::install("graph")
+#' BiocManager::install("Rgraphviz")
 #'
 #' @param node A data.frame, the nodes calculated in get_nodes_from_structure().
 #' @param my_structure A list, the functional structure calculated in
 #' create_list_of_functional_structure().
 #'
+#' @examples
+#' library(badhacker)
+#'
+#' # Either
+#' filename <- "test-optimize911-onefile.R"
+#' path <- "./data/"
+#' # OR
+#' path <- "./data/Roptimize/"
+#' filename <- list.files(path)
+#' path <- rep(path, length(filename))
+#'
+#' my_structure <- badhacker::create_list_of_functional_structure(filename, path)
+#' nodes <- badhacker:::get_nodes_from_structure(my_structure)
+#' functional_relations <- badhacker:::get_edges_from_structure(my_structure)
+#' edges <- data.frame(from = functional_relations$from_id,
+#'                     to = functional_relations$to_id,
+#'                     arrows = rep("to", nrow(functional_relations)),
+#'                     stringsAsFactors = FALSE)
+#' my_graph <- visNetwork(nodes, edges) %>%
+#'   visOptions(highlightNearest = TRUE) %>%
+#'   visInteraction(navigationButtons = TRUE) %>%
+#'   visIgraphLayout()
+#' my_graph
 #' @return An array, the parent nodes
 get_parents_of <- function(node, my_structure) {
   nodes <- names(my_structure)
@@ -95,8 +121,8 @@ get_edges_from_structure <- function(my_structure) {
 #' @export
 #'
 #' @examples
-#' my_structure <- create_list_of_functional_structure(filename, path)
-#' visualize_functional_structure(my_structure)
+#' my_structure <- badhacker::create_list_of_functional_structure(filename, path)
+#' badhacker::visualize_functional_structure(my_structure)
 visualize_functional_structure <- function(my_structure) {
   nodes <- get_nodes_from_structure(my_structure)
   functional_relations <- get_edges_from_structure(my_structure)

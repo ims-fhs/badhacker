@@ -1,6 +1,9 @@
 #' Create a graphNEL object
 #'
 #' Create a graphNEL object from the functional structure.
+#' Needs install.packages("BiocManager") and
+#' BiocManager::install("graph")
+#' BiocManager::install("Rgraphviz")
 #'
 #' @param my_structure A list, the functional structure calculated in
 #' create_list_of_functional_structure().
@@ -32,6 +35,12 @@ create_graphNEL_object <- function(my_structure) {
     edges_vec <- c(own_parent)
     list_edges[[i]] <- list(edges=edges_vec, weights=rep(1, length(edges_vec)))
   }
+  # Package ‘graph’ was removed from the CRAN repository.
+  # Formerly available versions can be obtained from the archive.
+  # This package is now available from Bioconductor only, see <http://www.bioconductor.org/packages/release/bioc/html/graph.html>.
+  # if (!requireNamespace("BiocManager", quietly = TRUE))
+  #   install.packages("BiocManager")
+  # BiocManager::install("graph")
   my_graph <- graph::graphNEL(nodes=nodes, edgeL=list_edges, edgemode = "directed")
   return(my_graph)
 }
