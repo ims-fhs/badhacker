@@ -97,6 +97,11 @@ calculate_index_of_start_and_stop_lines <- function(lines, n_level = 0L) {
 #' The list contains all important information (the start index, the stop index,
 #' the names of dependent functions, the arguments, the corresponding defaults,
 #' the file name and the path to the file).
+#' Most liekly only this
+#' F <- function(x, y) {…}
+#' works, but not this
+#' F <- function(x,
+#'               y) {…}
 #'
 #' @param filename A character, the file name(s)
 #' @param path A character, the path to the file(s)
